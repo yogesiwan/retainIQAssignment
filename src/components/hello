@@ -1,0 +1,269 @@
+import React, { useState } from "react";
+import "./Home.css";
+import { CiSettings, CiCreditCard1, CiImageOn } from "react-icons/ci";
+import { LuShirt } from "react-icons/lu";
+import { IoFlashOutline } from "react-icons/io5";
+import { GiPaperWindmill } from "react-icons/gi";
+import { FaArrowLeft, FaPlus } from "react-icons/fa";
+import { TbGridDots } from "react-icons/tb";
+import { RiDeleteBin3Line } from "react-icons/ri";
+import { FaRegEdit } from "react-icons/fa";
+import { BsThreeDotsVertical } from "react-icons/bs";
+
+const Home = () => {
+  const [states, setStates] = useState([{ id: Date.now(), variants: ["."] }]);
+  const [variantCount, setVariantCount] = useState(1);
+  const [isHoveredId, setIsHoveredId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedVariant, setSelectedVariant] = useState(null);
+  const [idx, setidx] = useState(0);
+  const [varidx, setvaridx] = useState(0);
+
+  // Sample images to choose from
+  const imageOptions = [
+    "https://cdn.marvel.com/u/prod/marvel/i/mg/3/e0/661e9b6428e34/standard_incredible.jpg",
+    "https://cdn.marvel.com/u/prod/marvel/i/mg/3/50/537ba56d31087/standard_incredible.jpg",
+    "https://cdn.marvel.com/u/prod/marvel/i/mg/9/30/538cd33e15ab7/standard_incredible.jpg",
+    "https://cdn.marvel.com/u/prod/marvel/i/mg/5/c0/537ba730e05e0/standard_incredible.jpg",
+    "https://cdn.marvel.com/u/prod/marvel/i/mg/1/c0/537ba2bfd6bab/standard_incredible.jpg",
+  ];
+
+  // Add a new state (row) with empty variants
+  const addState = () => {
+    const lastStateVariantsLength =
+      states.length > 0 ? states[states.length - 1].variants.length : 0;
+    const newVariants = Array(lastStateVariantsLength).fill(".");
+    setStates([...states, { id: Date.now(), variants: newVariants }]);
+  };
+
+  // Remove a specific state (row)
+  const removeState = (id) => {
+    setStates(states.filter((state) => state.id !== id));
+  };
+
+  const addVariant = () => {
+    console.log(states);
+    setStates(
+      states.map((state) => ({
+        ...state,
+        variants: [...state.variants, "."], // Add an empty string to the variants array of each state
+      }))
+    );
+    setVariantCount(variantCount + 1); // Increment the variant count
+  };
+
+  // Remove a specific variant (column) from a state
+  const removeVariant = (stateId, variantIndex) => {
+    setStates(
+      states.map((state) =>
+        state.id === stateId
+          ? {
+              ...state,
+              variants: state.variants.filter(
+                (_, index) => index !== variantIndex
+              ),
+            }
+          : state
+      )
+    );
+  };
+
+  // Open modal for image selection
+  const openImageSelector = (index, variantIndex) => {
+    setidx(index);
+    setvaridx(variantIndex);
+    setIsModalOpen(true);
+  };
+  // Set the selected image to the variant
+  const setAvatar = (image) => {
+    let varIndex = varidx;
+    setStates(
+      states.map((state, index) =>
+        index === idx
+          ? {
+              ...state,
+              variants: state.variants.map((variant, vIndex) =>
+                vIndex === varIndex ? image : variant
+              ), // Update only the selected variant immutably
+            }
+          : state
+      )
+    );
+    setIsModalOpen(false);
+  };
+
+  // Close modal after image selection
+  const closeImageSelector = () => {
+    setIsModalOpen(false);
+  };
+  
+  const onDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const reorderedStates = Array.from(states);
+    const [removed] = reorderedStates.splice(result.source.index, 1);
+    reorderedStates.splice(result.destination.index, 0, removed);
+    setStates(reorderedStates);
+  };
+
+
+
+  return (
+    <div className="main-container">
+      <div className="sidebar">
+        <GiPaperWindmill className="icon" />
+        <IoFlashOutline className="icon" />
+        <CiImageOn className="icon" />
+        <LuShirt className="icon" />
+        <div className="sidebar-bottom">
+          <CiCreditCard1 className="icon" />
+          <CiSettings className="icon" />
+        </div>
+      </div>
+      <div className="content-area">
+        <div className="top-bar">Top Bar</div>
+        <div className="main-content">
+          <div className="main-content-top">
+            <div className="main-content-top-left">
+              <FaArrowLeft className="diff others"></FaArrowLeft>
+              <div className="text">
+                <h1>Test 3_staging</h1>
+                <div className="line-break1"></div>
+              </div>
+              <div>
+                <button className="btn">Primary Feed</button>
+              </div>
+            </div>
+            <div className="main-content-top-right">
+              <button className="btn"> Publish Feed</button>
+            </div>
+          </div>
+          <div className="line-break"></div>
+
+          {/* Table scroll container */}
+          
+          
+          <div className="table-container">
+            {/* Table header */}
+            <div className="table-headers">
+              <div className="product-filter">Product Filters</div>
+              <div className="headers">
+                {Array.from({ length: variantCount }, (_, i) => (
+                  <div key={i} className="header">
+                    {i === 0 ? "Primary Variant" : `Variant ${i + 1}`}
+                    <BsThreeDotsVertical className="triple-h" />
+                  </div>
+                ))}
+              </div>
+              {/* <div className="row-numbering-line"></div> */}
+            </div>
+
+            {/* Table content (rows) */}
+            {states.map((state, index) => (
+              <div
+                key={state.id}
+                className="state-row"
+                onMouseEnter={() => setIsHoveredId(state.id)}
+                onMouseLeave={() => setIsHoveredId(null)}
+              >
+                <div className="drag-handle">
+                  {isHoveredId === state.id && (
+                    <span
+                      className="dustbin"
+                      onClick={() => removeState(state.id)}
+                    >
+                      <RiDeleteBin3Line />
+                    </span>
+                  )}
+                  <div className="row-numbering">
+                    <span className="row-number">{index + 1}</span>
+                    <TbGridDots className="triple-dot" />
+                    <div className="row-numbering-line"></div>
+                  </div>
+                </div>
+
+                {/* Variant columns */}
+                <div className="variant-columns">
+                  <div className="product-filters">Apply Product Filters</div>
+                  <div className="row-numbering-line"></div>
+                  {Array.from({ length: variantCount }, (_, variantIndex) => (
+                    <>
+                      <div key={variantIndex} className="variant">
+                        <div className="variant-img">
+                          {state.variants[variantIndex] !== "." ? (
+                            <>
+                              <img
+                                src={state.variants[variantIndex]}
+                                alt="Variant"
+                              />
+
+                              <div className="pencil">
+                                <FaRegEdit
+                                  className="pencil-icon"
+                                  onClick={() =>
+                                    openImageSelector(index, variantIndex)
+                                  }
+                                />
+                              </div>
+                            </>
+                          ) : (
+                            <div></div>
+                          )}
+                          {state.variants[variantIndex] === "." ? (
+                            <button
+                              className="plus-icon"
+                              onClick={() => openImageSelector(index, variantIndex)}
+                            >
+                              <FaPlus />
+                              Add Design
+                            </button>
+                          ) : null}
+                        </div>
+                      </div>
+                      <div className="row-numbering-line"></div>
+                    </>
+                  ))}
+                </div>
+
+                <button
+                  className="variant-add"
+                  onClick={() => addVariant(state.id)}
+                >
+                  <FaPlus />
+                </button>
+              </div>
+            ))}
+            <button className="variant-add" onClick={addState}>
+              <FaPlus />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Image Selection Modal */}
+      {isModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2>Select an Image</h2>
+            <div className="image-options">
+              {imageOptions.map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`Option ${index}`}
+                  onClick={() => setAvatar(image)}
+                  className="image-option"
+                />
+              ))}
+            </div>
+            <button className="btn" onClick={closeImageSelector}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Home;
