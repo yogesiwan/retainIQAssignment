@@ -1,7 +1,3 @@
-Here's the updated README file based on your inputs:
-
----
-
 # Frontend Developer Assignment: UI Implementation
 
 This project implements a user interface (UI) resembling a table structure, where each row represents a state and each column represents a design variant. Users can dynamically add/remove states (rows), add/remove design variants (columns), reorder rows using drag-and-drop, and (optionally) insert designs into specific variant columns.
