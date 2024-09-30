@@ -58,8 +58,13 @@ const Home = () => {
 
   // Function to remove a specific state (row) based on its ID
   const removeState = (id) => {
+    if(states.length==1){
+      showAlert("Ek to rehne do ")
+    }
+    else{
     setStates(states.filter((state) => state.id !== id)); // Filter out the state with the given ID
     showAlert("State removed!");
+    }
   };
 
   // Function to add a new variant (column) to each state

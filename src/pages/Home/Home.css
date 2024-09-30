@@ -449,6 +449,10 @@ body {
    padding: 5px 10px 5px 10px;
    background-color: white;
    border: 2px solid rgb(235, 237, 240);
+   transition: 0.2s ease-in-out;
+ }
+ .plus-icon:hover{
+  background: rgba(230, 239, 242, 0.662);
  }
   .product-filters {
     display: flex;
