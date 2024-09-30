@@ -577,4 +577,33 @@ body {
   .cancel:hover{
     transform: scale(1.1); 
   }
+  .alert-box {
+    position: fixed;
+    top: 100px;
+    left: 700px;
+    display: flex;
+    align-items: center;
+    height: 20px;
+    padding: 10px 20px;
+    background-color: rgba(255, 255, 255, 1);
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+  }
+  
+  .check-icon {
+    color: green;
+    font-size: 24px; /* Size of the check icon */
+    margin-right: 10px;
+  }
+  
+  .alert-content {
+    text-align: left;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  /* .alert-message{
+    color: black;
+    font-weight: 100;
+  } */
   

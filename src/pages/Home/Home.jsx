@@ -10,6 +10,7 @@ import { RiDeleteBin3Line } from "react-icons/ri";
 import { FaRegEdit } from "react-icons/fa";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { FaCheckCircle } from "react-icons/fa";
 
 const Home = () => {
   // State variables
@@ -35,18 +36,30 @@ const Home = () => {
     "https://cdn.marvel.com/u/prod/marvel/i/mg/c/10/537ba5ff07aa4/standard_incredible.jpg",
     "https://cdn.marvel.com/u/prod/marvel/i/mg/2/60/537bcaef0f6cf/standard_incredible.jpg",
   ];
+  const showAlert = (message) => {
+    const alertBox = document.getElementById("custom-alert");
+    const alertMessage = document.getElementById("alert-message");
+    alertMessage.textContent = message; // Set custom alert message
+    alertBox.style.display = "flex"; // Show the custom alert box
 
+    // Automatically hide the alert box after 2 seconds
+    setTimeout(() => {
+      alertBox.style.display = "none";
+    }, 700);
+  };
   // Function to add a new state (row) with empty variants
   const addState = () => {
     const lastStateVariantsLength =
       states.length > 0 ? states[states.length - 1].variants.length : 0; // Get the length of the last state's variants
     const newVariants = Array(lastStateVariantsLength).fill("."); // Create new variants initialized to "."
     setStates([...states, { id: Date.now(), variants: newVariants }]); // Add new state to the list
+    showAlert("New state added!");
   };
 
   // Function to remove a specific state (row) based on its ID
   const removeState = (id) => {
     setStates(states.filter((state) => state.id !== id)); // Filter out the state with the given ID
+    showAlert("State removed!");
   };
 
   // Function to add a new variant (column) to each state
@@ -58,6 +71,7 @@ const Home = () => {
       }))
     );
     setVariantCount(variantCount + 1); // Increment the variant count
+    showAlert("Variant added!");
   };
 
   // Function to remove a specific variant (column) from a state
@@ -73,7 +87,10 @@ const Home = () => {
             }
           : state
       )
+      
     );
+    showAlert("Variant removed!");
+    
   };
 
   // Function to open the modal for image selection
@@ -91,8 +108,8 @@ const Home = () => {
         index === idx
           ? {
               ...state,
-              variants: state.variants.map((variant, vIndex) =>
-                vIndex === varIndex ? image : variant // Update the selected variant with the new image
+              variants: state.variants.map(
+                (variant, vIndex) => (vIndex === varIndex ? image : variant) // Update the selected variant with the new image
               ),
             }
           : state
@@ -137,9 +154,15 @@ const Home = () => {
     varRemoveCancelfn(); // Close the variant removal options
   };
 
-
   return (
     <div className="main-container">
+      <div id="custom-alert" className="alert-box" style={{ display: 'none' }}>
+        <FaCheckCircle className="check-icon" /> 
+        <div className="alert-content">
+          <p id="alert-message">zzz</p>
+        </div>
+      </div>
+
       <div className="sidebar">
         <GiPaperWindmill className="icon windmill" />
         <IoFlashOutline className="icon" />
@@ -169,7 +192,7 @@ const Home = () => {
             </div>
           </div>
           <div className="line-break"></div>
-  
+
           {/* Table scroll container */}
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="droppable">
@@ -184,24 +207,41 @@ const Home = () => {
                     <div className="product-filter">Product Filters</div>
                     <div className="headers">
                       {Array.from({ length: variantCount }, (_, i) => (
-                         <div key={i} className="header">
-                         {i === 0 ? "Primary Variant" : `Variant ${i + 1}`}
-                         <BsThreeDotsVertical className="triple-h" onClick={()=>{varRemoveShowfn(i)}}/>   
-                         {showVarRemove===i? 
-                         <div className="remover">
-                           <div className="remove" onClick={()=>{varRemovefn(i)}} >
-                             Remove
-                           </div>
-                           <div className="cancel" onClick={()=>{varRemoveCancelfn()}}>
-                             Cancel
-                           </div>
-                         </div>
-                           :<></>}                        
-                       </div>
+                        <div key={i} className="header">
+                          {i === 0 ? "Primary Variant" : `Variant ${i + 1}`}
+                          <BsThreeDotsVertical
+                            className="triple-h"
+                            onClick={() => {
+                              varRemoveShowfn(i);
+                            }}
+                          />
+                          {showVarRemove === i ? (
+                            <div className="remover">
+                              <div
+                                className="remove"
+                                onClick={() => {
+                                  varRemovefn(i);
+                                }}
+                              >
+                                Remove
+                              </div>
+                              <div
+                                className="cancel"
+                                onClick={() => {
+                                  varRemoveCancelfn();
+                                }}
+                              >
+                                Cancel
+                              </div>
+                            </div>
+                          ) : (
+                            <></>
+                          )}
+                        </div>
                       ))}
                     </div>
                   </div>
-  
+
                   {/* Table content (rows) */}
                   {states.map((state, index) => (
                     <Draggable
@@ -235,7 +275,7 @@ const Home = () => {
                               <div className="row-numbering-line"></div>
                             </div>
                           </div>
-  
+
                           {/* Variant columns */}
                           <div className="variant-columns">
                             <div className="product-filters">
@@ -290,7 +330,7 @@ const Home = () => {
                               )
                             )}
                           </div>
-  
+
                           <button
                             className="variant-add"
                             onClick={() => addVariant(state.id)}
@@ -311,23 +351,28 @@ const Home = () => {
           </DragDropContext>
         </div>
       </div>
-  
+
       {/* Image Selection Modal */}
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal">
             <h2>Select an Image</h2>
             <div className="image-options">
-              {imageOptions.map((image, index) => (
-                index==0 ? <div className='no-image' onClick={() => setAvatar(image)}>No Image</div>:
-                <img
-                  key={index}
-                  src={image}
-                  alt={`Option ${index}`}
-                  onClick={() => setAvatar(image)}
-                  className="image-option"
-                />
-              ))}
+              {imageOptions.map((image, index) =>
+                index == 0 ? (
+                  <div className="no-image" onClick={() => setAvatar(image)}>
+                    No Image
+                  </div>
+                ) : (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={`Option ${index}`}
+                    onClick={() => setAvatar(image)}
+                    className="image-option"
+                  />
+                )
+              )}
             </div>
             <button className="btn" onClick={closeImageSelector}>
               Close
